@@ -1,0 +1,36 @@
+.home-header {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 34px;
+  .home-header-logo {
+      .icon-react,.icon-icon-test,.icon-typescript {
+        margin-right: 5px;
+        font-size: inherit;
+      }
+      .icon-react {
+        color: #61dafb;
+      }
+      .icon-icon-test {
+        color: #deb887;
+      }
+      .icon-typescript  {
+        color: blue;
+      }
+    }
+    .home-header-title {
+      margin-right: auto;
+      margin-left: 30px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .home-header-space {
+      margin-left: 20px;
+      font-size: 16px;
+    }
+}
+
+.ant-layout-header {
+  background-color: #fff;
+  padding-left: 20px;
+}

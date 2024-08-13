@@ -1,14 +1,20 @@
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import store from '../store'
+import { message } from 'antd'
+import { clearToken } from '../store/modules/users'
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000/',
   timeout: 5000
 })
 
-
 // 请求拦截
 instance.interceptors.request.use(function(config) {
+  // 请求头
+  if(config.headers) {
+    config.headers.authorization = store.getState().users.token
+  }
   return config
 }, function(error) {
   return Promise.reject(error)
@@ -17,6 +23,18 @@ instance.interceptors.request.use(function(config) {
 
 // 响应拦截
 instance.interceptors.response.use(function(response) {
+  if(response.data.errmsg === 'token error') {
+    message.error('token error')
+    // 调用同步方法
+    store.dispatch(clearToken())
+    // 不建议编程式路由，不刷新页面
+    setTimeout(() => {
+      window.location.replace('/login')
+    }, 1000)
+  }
+  else if(response.data.errmsg === 'error') {
+    // navigator('/500')
+  }
   return response
 }, function(error) {
   return Promise.reject(error)

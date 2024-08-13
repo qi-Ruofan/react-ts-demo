@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import http from '../../utils/http'
 type Token = string
-type Infos = {
+export type Infos = {
   [index:string]: unknown // 索引签名
 }
 export type UsersState = {
@@ -40,7 +40,7 @@ export const loginAction = createAsyncThunk('users/loginAction', async (payload:
 })
 
 export const infosAction = createAsyncThunk('users/infosAction', async () => {
-  const ret = await http.post('users/infos')
+  const ret = await http.get('users/infos')
   return ret
 })
 
