@@ -40,9 +40,9 @@ export default function HomeAside() {
   return (
     <Menu
       onClick={onClick}
-      style={{ width: 200 }}
-      defaultSelectedKeys={[path]}
-      defaultOpenKeys={[subPath]}
+      style={{ width: 300 }}
+      selectedKeys={[path]}
+      openKeys={[subPath]}
       mode="inline"
       items={items}
     />

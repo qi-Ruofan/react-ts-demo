@@ -17,7 +17,7 @@ export default function Home() {
         <HomeHeader />
       </Header>
       <Layout>
-        <Sider width={200} theme='light'>
+        <Sider width={300} theme='light'>
           <HomeAside />
         </Sider>
         <Layout style={{padding: '20px'}}>

@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import usersReducer from './modules/users'
+import signsReducer from './modules/signs'
 import type { Reducer, AnyAction } from '@reduxjs/toolkit'
 import { UsersState } from './modules/users'
 import type { PersistPartial } from 'redux-persist/es/persistReducer'
@@ -20,7 +21,8 @@ const persistConfig = {
 
 const store = configureStore({
   reducer: {
-    users: persistReducer(persistConfig, usersReducer) as Reducer<UsersState & PersistPartial, AnyAction> // 持久化users下的token
+    users: persistReducer(persistConfig, usersReducer) as Reducer<UsersState & PersistPartial, AnyAction> ,// 持久化users下的token
+    signs: signsReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
