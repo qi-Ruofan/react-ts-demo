@@ -1,3 +1,6 @@
+/**
+ * 异常考勤审批页
+ */
 import React, {useState,useEffect} from 'react'
 import styles from './Exception.module.scss'
 import { Row, Col, Empty, Timeline, Card, Space, Button, Select } from 'antd'
@@ -7,7 +10,8 @@ import { RootState, useAppDispatch } from '../../store';
 import { Link, useSearchParams } from 'react-router-dom'
 import { getTimeAction,updateInfos } from '../../store/modules/signs'
 import type { Infos } from '../../store/modules/signs';
-import _ from 'lodash'
+import { getApplyList, updateApplyList } from '../../store/modules/checks'
+import _, { divide } from 'lodash'
 
 const date = new Date()
 export default function Exception() {
@@ -16,6 +20,7 @@ export default function Exception() {
   const signsInfos = useSelector((state: RootState) => state.signs.infos)
   const usersInfos = useSelector((state: RootState) => state.users.infos)
   const [month, setMonth] = useState( searchParams.get('month') ? Number(searchParams.get('month'))-1 : date.getMonth())
+  const applyList = useSelector((state:RootState) => state.checks.applyList)
   const dispatch = useAppDispatch()
 
   // 初始数据获取
@@ -29,6 +34,17 @@ export default function Exception() {
       })
     }
   }, [signsInfos,dispatch,usersInfos])
+  useEffect(() => {
+    if(_.isEmpty(applyList)) {
+      dispatch(getApplyList({applicantid: usersInfos._id as string})).then(res => {
+        const { errcode, rets } = (res.payload as {[index:string]:unknown}).data as {[index:string]:unknown}
+        if(errcode === 0) {
+          dispatch(updateApplyList(rets as Infos[]))
+          // setApplyList(rets as Infos[])
+        }
+      })
+    }
+  }, [applyList, dispatch, usersInfos])
 
   const renderTime = (date: string) => {
     const ret = ((signsInfos.time as {[index: string]: unknown})[toZero(month+1)] as {[index: string]: unknown})[date];
@@ -39,6 +55,11 @@ export default function Exception() {
       return '暂无打卡记录';
     }
   }
+  const applyListMonth = applyList.filter(v => {
+    const startTime = (v.time as string[])[0].split(' ')[0].split('-')
+    const endTime = (v.time as string[])[1].split(' ')[0].split('-')
+    return startTime[1] <= toZero(month + 1) && endTime[1] >= toZero(month + 1)
+  })
 
   let details
   if(signsInfos.detail) {
@@ -77,11 +98,11 @@ export default function Exception() {
           {
             details 
                 ?   
-                <Timeline>
-                  {
-                    details.map(v => {
-                      return (
-                        <Timeline.Item key={v[0]}>
+                <Timeline items={
+                  details.map(v => {
+                    return {
+                      children: (
+                        <>
                           <h3>{year}/{month+1}/{v[0]}</h3>
                           <Card className={styles['exception-card']}>
                             <Space>
@@ -89,11 +110,11 @@ export default function Exception() {
                               <p>{renderTime(v[0])}</p>
                             </Space>
                           </Card>
-                        </Timeline.Item>
+                        </>
                       )
-                    })
-                  }
-                 
+                    }
+                  })
+                }>
                 </Timeline>
                 : 
                 <Empty description="暂无申请审批" imageStyle={{height: 200}}/>
@@ -117,24 +138,30 @@ export default function Exception() {
         </Col>
         <Col span={12}>
           {/* <Empty description="暂无申请审批" imageStyle={{height: 200}}/> */}
-          <Timeline>
-              <Timeline.Item>
-                <h3>事假</h3>
-                <Card className={styles['exception-card']}>
-                  <h4>带审批</h4>
-                  <p className={styles['exception-context']}>申请日期：2022-12-09</p>
-                  <p className={styles['exception-context']}>申请详情 啊啊啊啊啊</p>
-                </Card>
-              </Timeline.Item>
-              <Timeline.Item>
-                <h3>2022/12/01</h3>
-                <Card className={styles['exception-card']}>
-                  <h4>带审批</h4>
-                  <p className={styles['exception-context']}>申请日期：2022-12-09</p>
-                  <p className={styles['exception-context']}>申请详情 啊啊啊啊啊</p>
-                </Card>
-              </Timeline.Item>
-          </Timeline>
+          {
+            applyListMonth.length 
+            ?
+            <Timeline items={
+                  applyListMonth.map(item => {
+                    return {
+                      children: (
+                        <>
+                          <h3>{item.reason as string}</h3>  
+                          <Card className={styles['exception-card']}>
+                            <h4>{item.state as string}</h4>
+                            <p className={styles['exception-context']}>申请日期：{(item.time as string[])[0]} - {(item.time as string[])[1]}</p>
+                            <p className={styles['exception-context']}>申请详情： {item.note as string}</p>
+                          </Card>
+                        </>
+                      )
+                    }
+                  })
+                }>
+            </Timeline>
+            :
+            <Empty description="暂无申请审批" imageStyle={{height: 200}}/>
+          }
+          
         </Col>
       </Row>
     </div>

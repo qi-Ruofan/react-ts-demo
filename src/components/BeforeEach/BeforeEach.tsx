@@ -23,7 +23,7 @@ export default function BeforeEach(props: BeforeEachProps) {
   // 类型保护
   if(Array.isArray(matchs)) {
     const meta = matchs[matchs.length-1].route.meta
-   
+    const routerName = matchs[matchs.length-1].route.name
     // // 权限判断
     if(meta?.auth && _.isEmpty(infos)) {
       if(token) {
@@ -36,6 +36,8 @@ export default function BeforeEach(props: BeforeEachProps) {
       } else {
         return <Navigate to="/login" />
       }
+    } else if(Array.isArray(infos.permission) && !infos.permission.includes(routerName)) {
+      return <Navigate to="/403" />
     }
   }
   if(token && location.pathname === '/login') {

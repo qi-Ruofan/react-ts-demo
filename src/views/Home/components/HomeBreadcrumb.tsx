@@ -7,11 +7,8 @@ import { routes } from '../../../router'
 export default function HomeBreadcrumb() {
   const location = useLocation()
   const matchs = matchRoutes(routes, location)
+  const itemArr = matchs?.map(v => {return {'title': v.route.meta?.title}}) 
   return (
-    <Breadcrumb className={'home-breadcrumb'}>
-      {
-        matchs?.map(v => <Breadcrumb.Item key={v.pathnameBase}>{v.route.meta?.title}</Breadcrumb.Item>)
-      }
-    </Breadcrumb>
+    <Breadcrumb className={'home-breadcrumb'} items={itemArr as []} />
   )
 }

@@ -3,7 +3,7 @@ import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import store from '../store'
 import { message } from 'antd'
 import { clearToken } from '../store/modules/users'
-
+import router from '../router'
 const instance = axios.create({
   baseURL: 'http://localhost:3000/',
   timeout: 5000
@@ -33,7 +33,7 @@ instance.interceptors.response.use(function(response) {
     }, 1000)
   }
   else if(response.data.errmsg === 'error') {
-    // navigator('/500')
+    router.navigate('/500')
   }
   return response
 }, function(error) {
